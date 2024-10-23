@@ -21,13 +21,10 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'first_name',
-        'last_name',
         'email',
         'password',
         'infos'
     ];
-    protected $appends = ['name'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -50,14 +47,14 @@ class User extends Authenticatable
         'infos' => 'array'
     ];
 
-    public function getNameAttribute()
-    {
-        return $this->attributes['first_name'] . ' ' . $this->attributes['last_name'];
-    }
+//    public function getNameAttribute()
+//    {
+//        return $this->attributes['first_name'] . ' ' . $this->attributes['last_name'];
+//    }
 
-    public function transactions(): MorphMany
-    {
-        return $this->morphMany(Transaction::class, 'transactional');
-    }
+//    public function transactions(): MorphMany
+//    {
+//        return $this->morphMany(Transaction::class, 'transactional');
+//    }
 
 }

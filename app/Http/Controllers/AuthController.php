@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
-        $accountType = $request->accountType && in_array($request->accountType, ['student', 'teacher', 'parent']) ? $request->accountType : 'web';
+//        $accountType = $request->accountType && in_array($request->accountType, ['student', 'teacher', 'parent']) ? $request->accountType : 'web';
 
         // Determine the provider based on the guard
 //        $provider = config("auth.guards.{$accountType}.provider");
@@ -26,6 +26,7 @@ class AuthController extends Controller
 //        $user = (new $model)->where('email', $request->email)
 //            ->orWhere('infos->username' ,$request->username)->first();
 
+        $accountType='web';
         $attemptLogin = call_user_func([$this, $accountType], $request);
 
         if ($attemptLogin->status === false) {
@@ -43,26 +44,6 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
-
-    public function student(Request $request): object
-    {
-        $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-        ]);
-        $user  = Student::where('infos->username', $request->username)->first();
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return (object)[
-                'status' => false,
-            ];
-        }else{
-            return (object)[
-                'status' => true,
-                'user' => $user
-            ];
-        }
-    }
-
     public function web(Request $request): object
     {
         $request->validate([
@@ -81,45 +62,29 @@ class AuthController extends Controller
             ];
         }
     }
-    public function parent(Request $request): object
+
+    public function register(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'password_confirmation' => 'required|same:password',
+            'name' => 'required',
         ]);
-        $user = Parents::where('email', $request->email)->first();
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return (object)[
-                'status' => false,
-            ];
-        }else{
-            return (object)[
-                'status' => true,
-                'user' => $user
-            ];
-        }
-    }
 
-    public function teacher(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        $user = User::create([
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'name' => $request->name,
+            'phone' => $request->phone,
         ]);
-        $user = Teacher::where('email', $request->email)->first();
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return (object)[
-                'status' => false,
-            ];
-        }else{
-            return (object)[
+
+//        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
                 'status' => true,
-                'user' => $user
-            ];
-        }
-
+        ]);
     }
-
 
     public function logout(Request $request)
     {

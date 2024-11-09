@@ -15,7 +15,7 @@ class LongPollingController extends Controller
         $data['accountInfo'] = (new OrderController)->getAccountInfo($request);
         // add more data to the response
 
-        sleep(10);
+
         return response()->json($data);
     }
 }

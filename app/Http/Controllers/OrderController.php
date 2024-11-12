@@ -11,7 +11,8 @@ class OrderController extends Controller
     public function getState(): object
     {
         // Get data from JSON file and decode it as an object
-        $jsonString = file_get_contents(base_path('resources/json/state.json'));
+        $jsonString = file_get_contents(base_path('/home/ubuntu/monkey-coinbase/src/data/state.json'));
+
         Log::log('info', 'State retrieved successfully');
         Log::log('info', $jsonString);
 

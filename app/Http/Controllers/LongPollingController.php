@@ -28,12 +28,14 @@ class LongPollingController extends Controller
 
             return response()->json($data);
         } catch (\Exception $e) {
+
             Log::error('Failed to retrieve long polling data', [
                 'message' => $e->getMessage(),
                 'request_id' => $request->header('X-Request-ID')
             ]);
 
             return response()->json([
+                'message' => $e->getMessage(),
                 'error' => 'Failed to retrieve data'
             ], 500);
         }

@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,9 +27,11 @@ Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'
 
 
 Route::middleware( 'auth.multiGuard:student,teacher,parent,admin' )->group(function () {
+
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 
     Route::post('/getAccountOrders', [OrderController::class, 'getAccountOrders']);
+
     Route::post('/longPolling', [App\Http\Controllers\LongPollingController::class, 'getDataLongPolling']);
 
 //    Route::get('/getEvents', [EventController::class, 'getEvents']);

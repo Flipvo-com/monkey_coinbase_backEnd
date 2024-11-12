@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    public function getState(): object
+    {
+        // Get data from JSON file and decode it as an object
+        $jsonString = file_get_contents(base_path('resources/json/state.json'));
+        // false returns as an object
+        return json_decode($jsonString, false);
+    }
+
+
     public function getAccountOrders(Request $request): array
     {
         // get data from JSON file and return it

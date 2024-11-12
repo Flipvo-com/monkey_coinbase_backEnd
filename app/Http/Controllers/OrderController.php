@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -11,6 +12,9 @@ class OrderController extends Controller
     {
         // Get data from JSON file and decode it as an object
         $jsonString = file_get_contents(base_path('resources/json/state.json'));
+        Log::log('info', 'State retrieved successfully');
+        Log::log('info', $jsonString);
+
         // false returns as an object
         return json_decode($jsonString, false);
     }

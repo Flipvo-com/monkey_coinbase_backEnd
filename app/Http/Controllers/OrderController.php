@@ -56,12 +56,22 @@ class OrderController extends Controller
         $account = collect($data->get('accounts'))
             ->flatten(1)
             ->filter(function ($account) use ($request) {
-                return isset($account->currency) && $account->currency == $request->accountCurrency;
+//                return isset($account->currency) && $account->currency == $request->accountCurrency;
+                return isset($account->currency) && $account->currency == 'BTC';
             })
             ->map(function ($account) {
                 return collect($account)->except('orders');
             })
             ->first();
+
+        Log::info('----------------- Account Info -----------------');
+        Log::info('----------------- Account Info -----------------');
+        Log::info('----------------- Account Info -----------------');
+        Log::info('----------------- Account Info -----------------');
+        Log::info('----------------- Account Info -----------------');
+        Log::info('Account info retrieved successfully', ['account' => $account]);
+
+//        return $account->toArray();
         return $account->toArray();
     }
 

@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
-    $users = User::all();
-    return $users;
+//    $users = User::all();
+//    return $users;
     dd('Hello World');
     // redirect to encompass-online.com
 //    return redirect(env('APP_URL'));

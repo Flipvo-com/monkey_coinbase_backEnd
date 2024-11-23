@@ -14,7 +14,7 @@ class OrderController extends Controller
         $jsonString = file_get_contents(base_path('/resources/json/state.json'));
 
         Log::log('info', 'State retrieved successfully');
-        Log::log('info', $jsonString);
+//        Log::log('info', $jsonString);
 
         // false returns as an object
         return json_decode($jsonString, false);
@@ -64,12 +64,6 @@ class OrderController extends Controller
             })
             ->first();
 
-        Log::info('----------------- Account Info -----------------');
-        Log::info('----------------- Account Info -----------------');
-        Log::info('----------------- Account Info -----------------');
-        Log::info('----------------- Account Info -----------------');
-        Log::info('----------------- Account Info -----------------');
-        Log::info('Account info retrieved successfully', ['account' => $account]);
 
 //        return $account->toArray();
         return $account->toArray();

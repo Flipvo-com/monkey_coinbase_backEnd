@@ -46,8 +46,6 @@ class TraderController extends Controller
                 return response()->json(['error' => 'Invalid JSON format'], 500);
             }
 
-            Log::info('State retrieved successfully', ['data' => $data]);
-
             // Return JSON response
             return response()->json($data);
         } catch (\Exception $e) {

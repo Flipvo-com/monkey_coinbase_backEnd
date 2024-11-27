@@ -2,8 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Events\LessonInstanceStatusUpdatedEvent;
-use App\Models\LessonInstance;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,27 +27,28 @@ class UpdateLessonStatusesJob implements ShouldQueue
      */
     public function handle(): void
     {
+        Log::info('Running UpdateLessonStatusesJob');
         // Get the current time
         $now = Carbon::now();
         // Update 'scheduled' lessons to 'cancelled'
-        $cancelledInstances = LessonInstance::where('status', 'scheduled')
-            ->whereRaw('DATE_ADD(start, INTERVAL duration MINUTE) < ?', [$now])
-            ->get();
-
-        foreach ($cancelledInstances as $instance) {
-            $instance->update(['status' => 'cancelled']);
-            event(new LessonInstanceStatusUpdatedEvent($instance));
-        }
-
-        // Update 'in_progress' lessons to 'completed'
-        $completedInstances = LessonInstance::where('status', 'in_progress')
-            ->whereRaw('DATE_ADD(start, INTERVAL duration MINUTE) < ?', [$now])
-            ->get();
-
-        foreach ($completedInstances as $instance) {
-            $instance->update(['status' => 'completed']);
-            event(new LessonInstanceStatusUpdatedEvent($instance));
-        }
+//        $cancelledInstances = LessonInstance::where('status', 'scheduled')
+//            ->whereRaw('DATE_ADD(start, INTERVAL duration MINUTE) < ?', [$now])
+//            ->get();
+//
+//        foreach ($cancelledInstances as $instance) {
+//            $instance->update(['status' => 'cancelled']);
+//            event(new LessonInstanceStatusUpdatedEvent($instance));
+//        }
+//
+//        // Update 'in_progress' lessons to 'completed'
+//        $completedInstances = LessonInstance::where('status', 'in_progress')
+//            ->whereRaw('DATE_ADD(start, INTERVAL duration MINUTE) < ?', [$now])
+//            ->get();
+//
+//        foreach ($completedInstances as $instance) {
+//            $instance->update(['status' => 'completed']);
+//            event(new LessonInstanceStatusUpdatedEvent($instance));
+//        }
 
     }
 }

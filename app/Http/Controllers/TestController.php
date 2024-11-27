@@ -2,46 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
-    private function generateToken($path, $method = 'GET'): string
+    private const BASE_URL = 'https://api.coinbase.com/api/v3/brokerage'; // Stored BASE_URL directly here
+
+    public function test(Request $request): JsonResponse
     {
-        $baseUrl = env('COINBASE_BASE_URL'); // Ensure this is defined in your .env
-        $keyName = env('COINBASE_KEY_NAME');
-        $keySecret = env('COINBASE_KEY_SECRET');
-        $uri = $method . ' ' . $baseUrl . $path;
 
-        $payload = [
-            'iss' => 'cdp',
-            'nbf' => time(),
-            'exp' => time() + 120,
-            'sub' => $keyName,
-            'uri' => $uri,
+        $path = '/accounts'; // Example API endpoint
+        $params = [
+            'limit' => 100, // Example parameter
         ];
 
-        $header = [
-            'kid' => $keyName,
-            'nonce' => bin2hex(random_bytes(16)),
-        ];
+        $response = $this->apiCall($path, $params);
 
-        return JWT::encode($payload, $keySecret, 'ES256', null, $header);
+        if (isset($response['error'])) {
+            return response()->json([
+                'state' => 'error',
+                'message' => 'API call failed',
+                'data' => $response,
+            ]);
+        }
+
+        return response()->json([
+            'state' => 'success',
+            'message' => 'API call succeeded',
+            'data' => $response,
+        ]);
     }
 
     private function apiCall(string $path, array $params = [], string $method = 'GET', $data = null): array
     {
-        $baseUrl = env('COINBASE_BASE_URL'); // Define in your .env
         $keyName = env('COINBASE_KEY_NAME');
         $token = $this->generateToken($path, $method);
 
         $queryString = http_build_query($params);
-        $url = $baseUrl . $path . ($queryString ? '?' . $queryString : '');
+        $url = self::BASE_URL . $path . ($queryString ? '?' . $queryString : '');
+
+//        return [
+//            'url' => $url,
+//            'token' => $token,
+//            'keyName' => $keyName,
+//            'method' => $method,
+//            'data' => $data,
+//        ];
+
 
         $headers = [
             'Authorization' => 'Bearer ' . $token,
@@ -58,29 +69,46 @@ class TestController extends Controller
                 'json' => $data,
             ]);
 
-            return json_decode($response->getBody()->getContents(), true);
+            return json_decode($response->getBody()->getContents(), true) ?? [];
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 $response = $e->getResponse();
-                return json_decode($response->getBody()->getContents(), true);
+                return json_decode($response->getBody()->getContents(), true) ?? [
+                    'error' => $response->getReasonPhrase(),
+                    'code' => $response->getStatusCode(),
+                ];
             }
-            return ['error' => $e->getMessage()];
+            return [
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+            ];
         }
     }
 
-    public function test(): JsonResponse
+    private function generateToken($path, $method = 'GET'): string
     {
-        $path = '/accounts'; // Example path
-        $params = [
-            'limit' => 100, // Example parameter
+        $keyName = env('COINBASE_KEY_NAME');
+        $keySecret = env('COINBASE_KEY_SECRET');
+        $uri = $method . ' ' . self::BASE_URL . $path;
+
+        $payload = [
+            'iss' => 'cdp',
+            'nbf' => time(),
+            'exp' => time() + 120,
+            'sub' => $keyName,
+            'uri' => $uri,
         ];
 
-        $response = $this->apiCall($path, $params);
+        $header = [
+            'kid' => $keyName,
+            'nonce' => bin2hex(random_bytes(16)),
+        ];
 
-        return response()->json([
-            'state' => 'success',
-            'message' => 'This is a test route',
-            'data' => $response,
-        ]);
+        return JWT::encode($payload, $keySecret, 'ES256', null, $header);
     }
 }

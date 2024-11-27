@@ -3,63 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Models\InvestmentTransaction;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 
 class InvestmentTransactionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Fetch all transactions
+    public function index(): JsonResponse
     {
-        //
+        $transactions = InvestmentTransaction::with('user')->get();
+        return response()->json($transactions);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // Store a new transaction
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric',
+            'transaction_type' => 'required|in:investment,withdrawal',
+            'transaction_date' => 'required|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $transaction = InvestmentTransaction::create($validated);
+
+        return response()->json(['message' => 'Transaction created successfully.', 'data' => $transaction], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // Fetch transactions by user
+    public function getByUser($userId): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(InvestmentTransaction $investmentTransaction)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(InvestmentTransaction $investmentTransaction)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, InvestmentTransaction $investmentTransaction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(InvestmentTransaction $investmentTransaction)
-    {
-        //
+        $transactions = InvestmentTransaction::where('user_id', $userId)->get();
+        return response()->json($transactions);
     }
 }

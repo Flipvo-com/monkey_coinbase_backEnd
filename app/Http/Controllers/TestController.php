@@ -7,6 +7,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
 
 class TestController extends Controller
 {
@@ -15,7 +18,7 @@ class TestController extends Controller
     public function test(Request $request): JsonResponse
     {
         // Call getServerTime function
-        $response = $this->getServerTime();
+        $response = $this->getPublicProduct($request);
 
         return response()->json([
             'state' => 'success',
@@ -233,11 +236,26 @@ class TestController extends Controller
 
     // Function to get public product candles
 
+//    public function getPublicProduct(Request $request): JsonResponse
+//    {
+//        $productId = $request->get('product_id', 'BTC-USD');
+//        return $this->makeGetRequest("/market/products/$productId");
+//    }
+
     public function getPublicProduct(Request $request): JsonResponse
     {
         $productId = $request->get('product_id', 'BTC-USD');
-        return $this->makeGetRequest("/market/products/$productId");
+
+        // Cache key
+        $cacheKey = "market_product_{$productId}";
+
+        // Attempt to fetch from cache, or execute and cache the result for 30 seconds
+        return Cache::remember($cacheKey, 30, function () use ($productId) {
+            Log::info("Fetching product data for $productId from API");
+            return $this->makeGetRequest("/market/products/$productId");
+        });
     }
+
 
     // Function to get public market trades for a specific product
 

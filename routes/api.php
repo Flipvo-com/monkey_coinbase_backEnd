@@ -20,6 +20,7 @@ use App\Http\Controllers\LongPollingController;
 */
 
 Route::get('/test',  [TestController::class, 'test']);
+Route::get('/getPublicProduct',  [TestController::class, 'getPublicProduct']);
 
 // route for login
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);

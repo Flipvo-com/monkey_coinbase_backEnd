@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
@@ -67,7 +68,7 @@ class TestController extends Controller
         }
     }
 
-    public function test(Request $request): JsonResponse
+    public function test(): JsonResponse
     {
         $path = '/accounts'; // Example path
         $params = [

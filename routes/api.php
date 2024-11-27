@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\InvestmentController;
 use App\Http\Controllers\InvestmentTransactionController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\TraderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
@@ -18,9 +19,7 @@ use App\Http\Controllers\LongPollingController;
 |
 */
 
-Route::get('/test', function () {
-    return response()->json(['message' => 'API is working!']);
-});
+Route::get('/test',  [TestController::class, 'test']);
 
 // route for login
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);

@@ -10,11 +10,10 @@ use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
-    private const BASE_URL = 'https://api.coinbase.com/api/v3/brokerage'; // Stored BASE_URL directly here
+    private const BASE_URL = 'https://api.coinbase.com/api/v3/brokerage';
 
     public function test(Request $request): JsonResponse
     {
-
         $path = '/accounts'; // Example API endpoint
         $params = [
             'limit' => 100, // Example parameter
@@ -45,20 +44,11 @@ class TestController extends Controller
         $queryString = http_build_query($params);
         $url = self::BASE_URL . $path . ($queryString ? '?' . $queryString : '');
 
-//        return [
-//            'url' => $url,
-//            'token' => $token,
-//            'keyName' => $keyName,
-//            'method' => $method,
-//            'data' => $data,
-//        ];
-
-
         $headers = [
             'Authorization' => 'Bearer ' . $token,
             'CB-ACCESS-KEY' => $keyName,
             'CB-ACCESS-SIGN' => $token,
-            'CB-ACCESS-TIMESTAMP' => time(),
+            'CB-ACCESS-TIMESTAMP' => (string)time(),
             'Content-Type' => 'application/json',
         ];
 
@@ -94,7 +84,9 @@ class TestController extends Controller
     {
         $keyName = env('COINBASE_KEY_NAME');
         $keySecret = env('COINBASE_KEY_SECRET');
-        $uri = $method . ' ' . self::BASE_URL . $path;
+
+        // URI should match what you used in the Node.js code
+        $uri = $method . ' ' . $path;
 
         $payload = [
             'iss' => 'cdp',
@@ -109,6 +101,7 @@ class TestController extends Controller
             'nonce' => bin2hex(random_bytes(16)),
         ];
 
+        // Encode the JWT with ES256 or switch to HS256 if needed
         return JWT::encode($payload, $keySecret, 'ES256', null, $header);
     }
 }

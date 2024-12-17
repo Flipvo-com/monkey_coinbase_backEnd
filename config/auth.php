@@ -40,21 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'student' => [
-            'driver' => 'sanctum',
-            'provider' => 'students',
-        ],
-        'teacher' => [
-            'driver' => 'sanctum',
-            'provider' => 'teachers',
-        ],
-        'parent' => [
-            'driver' => 'sanctum',
-            'provider' => 'parents',
-        ],
-        'admin' => [
+        'api' => [
             'driver' => 'sanctum',
             'provider' => 'users',
+            'hash' => false,
         ],
     ],
 

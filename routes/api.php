@@ -7,6 +7,7 @@ use App\Http\Controllers\TraderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LongPollingController;
+use App\Http\Controllers\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +27,12 @@ Route::get('/getPublicProduct',  [TestController::class, 'getPublicProduct']);
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
 
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/deposit', [TransactionController::class, 'deposit']);
+    Route::post('/withdraw', [TransactionController::class, 'withdraw']);
+    Route::get('/transactions', [TransactionController::class, 'getUserTransactions']);
+});
 
 // todo - Youcef, what is this? I wish this didn't have student, teacher, parent, etc stuff
 Route::middleware('auth.multiGuard:student,teacher,parent,admin')->group(function () {

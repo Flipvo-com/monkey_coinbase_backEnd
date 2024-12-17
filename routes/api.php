@@ -20,6 +20,7 @@ use App\Http\Controllers\TransactionController;
 |
 */
 
+// todo - remove!
 Route::get('/test',  [TestController::class, 'test']);
 Route::get('/getPublicProduct',  [TestController::class, 'getPublicProduct']);
 

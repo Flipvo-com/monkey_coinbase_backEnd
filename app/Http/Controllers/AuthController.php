@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Parents;
-use App\Models\Student;
-use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,62 +11,58 @@ class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
-//        $accountType = $request->accountType && in_array($request->accountType, ['student', 'teacher', 'parent']) ? $request->accountType : 'web';
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        // Determine the provider based on the guard
-//        $provider = config("auth.guards.{$accountType}.provider");
+        $user = User::where('email', $request->email)->first();
 
-        // Determine the model based on the provider
-//        $model = config("auth.providers.{$provider}.model");
-
-        // Attempt to fetch the user
-//        $user = (new $model)->where('email', $request->email)
-//            ->orWhere('infos->username' ,$request->username)->first();
-
-        $accountType='web';
-        $attemptLogin = call_user_func([$this, $accountType], $request);
-
-        if ($attemptLogin->status === false) {
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $token = $attemptLogin->user->createToken('auth_token')->plainTextToken;
-        $user = $attemptLogin->user;
-        $user['accountType'] = $accountType;
+        $token = $user->createToken('API Token')->plainTextToken;
 
         return response()->json([
+            'status' => true,
             'token' => $token,
             'user' => $user
         ]);
     }
-    public function web(Request $request): object
+
+    public function web(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
+
         $user = User::where('email', $request->email)->first();
+
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return (object)[
+            return response()->json([
                 'status' => false,
-            ];
-        }else{
-            return (object)[
-                'status' => true,
-                'user' => $user
-            ];
+                'message' => 'Invalid credentials'
+            ], 401);
         }
+
+        // Create token for web as well
+        $token = $user->createToken('API Token')->plainTextToken;
+
+        return response()->json([
+            'status' => true,
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 
+    // User Registration - Creates New User
     public function register(Request $request): JsonResponse
     {
-//        dd($request->all());
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-            'password_confirmation' => 'required|same:password',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|confirmed|min:6',
             'name' => 'required',
         ]);
 
@@ -77,24 +70,27 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'name' => $request->name,
-            'phone' => $request->phone,
         ]);
 
-//        $token = $user->createToken('auth_token')->plainTextToken;
+        // Generate Token for new user
+        $token = $user->createToken('API Token')->plainTextToken;
 
         return response()->json([
-                'status' => true,
-        ]);
+            'status' => true,
+            'token' => $token,
+            'user' => $user
+        ], 201);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-
-        $request->user()->currentAccessToken()->delete();
+        if ($request->user() && $request->user()->currentAccessToken()) {
+            $request->user()->currentAccessToken()->delete();
+        }
 
         return response()->json([
+            'status' => true,
             'message' => 'Logged out'
         ]);
     }
-
 }

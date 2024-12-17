@@ -45,6 +45,23 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+//        'student' => [
+//            'driver' => 'sanctum',
+//            'provider' => 'students',
+//        ],
+//        'teacher' => [
+//            'driver' => 'sanctum',
+//            'provider' => 'teachers',
+//        ],
+//        'parent' => [
+//            'driver' => 'sanctum',
+//            'provider' => 'parents',
+//        ],
+//        'admin' => [
+//            'driver' => 'sanctum',
+//            'provider' => 'users',
+//        ],
     ],
 
     /*

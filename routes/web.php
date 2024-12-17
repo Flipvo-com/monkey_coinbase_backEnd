@@ -20,3 +20,5 @@ Route::get('/', function () {
     // redirect to encompass-online.com
 //    return redirect(env('APP_URL'));
 });
+
+

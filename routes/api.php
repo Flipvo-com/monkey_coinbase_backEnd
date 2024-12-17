@@ -36,8 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions', [TransactionController::class, 'getUserTransactions']);
 });
 
+
 // todo - Youcef, what is this? I wish this didn't have student, teacher, parent, etc stuff
-Route::middleware('auth.multiGuard:student,teacher,parent,admin')->group(function () {
+Route::middleware('auth.multiGuard:admin')->group(function () {
     Route::get('/state', [TraderController::class, 'getState']);
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
     Route::post('/getAccountOrders', [OrderController::class, 'getAccountOrders']);

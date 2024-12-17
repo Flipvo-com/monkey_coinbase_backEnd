@@ -45,23 +45,11 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+        'admin' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
 
-//        'student' => [
-//            'driver' => 'sanctum',
-//            'provider' => 'students',
-//        ],
-//        'teacher' => [
-//            'driver' => 'sanctum',
-//            'provider' => 'teachers',
-//        ],
-//        'parent' => [
-//            'driver' => 'sanctum',
-//            'provider' => 'parents',
-//        ],
-//        'admin' => [
-//            'driver' => 'sanctum',
-//            'provider' => 'users',
-//        ],
     ],
 
     /*
@@ -86,18 +74,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        'students' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Student::class,
-        ],
-        'teachers' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Teacher::class,
-        ],
-        'parents' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Parents::class,
-        ],
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

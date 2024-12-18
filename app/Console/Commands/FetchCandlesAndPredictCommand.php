@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use OpenAI\Client as OpenAIClient;
 
 class FetchCandlesAndPredictCommand extends Command
 {
@@ -72,28 +71,41 @@ class FetchCandlesAndPredictCommand extends Command
     private function sendToOpenAI(array $candles): void
     {
         try {
-            $openai = new OpenAIClient(env('OPENAI_API_KEY'));
+            $url = 'https://api.openai.com/v1/chat/completions';
 
-            $messages = [
-                [
-                    'role' => 'system',
-                    'content' => 'You are a financial assistant that predicts short-term Bitcoin price movements. Use the provided historical price data to make predictions.'
-                ],
-                [
-                    'role' => 'user',
-                    'content' => "Based on the historical price data I'm going to provide, give me a JSON response with your opinion on whether Bitcoin will go up or down. " .
-                                'Include the confidence percentage for different time intervals, e.g., 10m, 30m, 1h, 3h, 6h, 12h, 1d, 3d, 1w, etc., and also predict the percentage increase or decrease for the current day. ' .
-                                'Here are the past Prices by hour: ' . json_encode($candles)
+            $payload = [
+                'model' => 'gpt-4o-mini',
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'You are a financial assistant that predicts short-term Bitcoin price movements. Use the provided historical price data to make predictions.'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => 'Based on the historical price data I\'m going to provide, give me a JSON response with your opinion on whether Bitcoin will go up or down. ' .
+                            'Include the confidence percentage for different time intervals, e.g., 10m, 30m, 1h, 3h, 6h, 12h, 1d, 3d, 1w, etc., and also predict the percentage increase or decrease for the current day. ' .
+                            'Here are the past Prices by hour: ' . json_encode($candles)
+                    ]
                 ]
             ];
 
-            $response = $openai->chat()->create([
-                'model' => 'gpt-4o-mini',
-                'messages' => $messages
-            ]);
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post($url, $payload);
 
-            Log::info('OpenAI Prediction Response:', ['response' => $response]);
-            $this->info('Prediction data received from OpenAI!');
+            if ($response->successful()) {
+                $responseData = $response->json();
+                Log::info('OpenAI Prediction Response:', ['response' => $responseData]);
+                $this->info('Prediction data received from OpenAI!');
+            } else {
+                Log::error('Failed to get prediction from OpenAI', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                $this->error('Failed to get prediction data from OpenAI.');
+            }
+
         } catch (\Exception $e) {
             Log::error('Error sending to OpenAI:', ['message' => $e->getMessage()]);
             $this->error('An error occurred while sending data to OpenAI.');

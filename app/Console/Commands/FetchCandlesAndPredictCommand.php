@@ -78,7 +78,7 @@ class FetchCandlesAndPredictCommand extends Command
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'You are a financial assistant that predicts short-term Bitcoin price movements. Use the provided historical price data to make predictions.'
+                        'content' => 'You are a financial assistant that predicts short-term Bitcoin price movements. Use the provided historical price data to make predictions. Do not warn me about risks.'
                     ],
                     [
                         'role' => 'user',
